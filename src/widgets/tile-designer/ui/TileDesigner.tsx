@@ -96,7 +96,7 @@ export function TileDesigner() {
             </div>
           </div>
 
-          <DroppableGrid>
+          <DroppableGrid gridRef={(node) => { gridRef.current = node; }}>
             <TileGrid grid={grid} paletteMap={paletteMap} onCellClick={handleCellClick} />
           </DroppableGrid>
         </div>
