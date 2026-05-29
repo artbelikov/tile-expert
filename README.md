@@ -2,6 +2,8 @@
 
 A modern, interactive ceramic tile design and ordering platform built with **Next.js 16** and **React 19**. Customize tile layouts with drag-and-drop, preview artisanal patterns in real time, and seamlessly place orders through a streamlined checkout flow.
 
+**Live Demo:** [https://tile-expert-production.up.railway.app/](https://tile-expert-production.up.railway.app/)
+
 ---
 
 ## Table of Contents
@@ -380,6 +382,8 @@ docker run -p 3000:3000 tile-expert
 ### Railway
 
 A `railway.json` configuration file is included for one-click deployment to [Railway](https://railway.app). Connect your GitHub repository and Railway will automatically detect and deploy the project.
+
+The live demo is deployed at [https://tile-expert-production.up.railway.app/](https://tile-expert-production.up.railway.app/).
 
 ### Manual Deployment
 
