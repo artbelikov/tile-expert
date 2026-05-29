@@ -1,0 +1,69 @@
+.borderLeft {
+  background-image: url("/border_left_vertical.png");
+  background-repeat: repeat-y;
+  background-position: left top;
+  background-size: 83.5px auto;
+}
+
+.borderRight {
+  background-image: url("/border_right_vertical.png");
+  background-repeat: repeat-y;
+  background-position: right top;
+  background-size: 83.5px auto;
+}
+
+.topLeft {
+  background-image: url("/border_top_left.png");
+  background-repeat: no-repeat;
+  background-position: left top;
+  background-size: contain;
+}
+
+.topRight {
+  background-image: url("/border_top_right.png");
+  background-repeat: no-repeat;
+  background-position: right top;
+  background-size: contain;
+}
+
+.bottomLeft {
+  background-image: url("/border_bottom_left.png");
+  background-repeat: no-repeat;
+  background-position: left bottom;
+  background-size: contain;
+}
+
+.bottomRight {
+  background-image: url("/border_bottom_right.png");
+  background-repeat: no-repeat;
+  background-position: right bottom;
+  background-size: contain;
+}
+
+.mobileTopLeft {
+  background-image: url("/mobile_top_left.png");
+  background-repeat: no-repeat;
+  background-position: left top;
+  background-size: contain;
+}
+
+.mobileTopRight {
+  background-image: url("/mobile_top_right.png");
+  background-repeat: no-repeat;
+  background-position: right top;
+  background-size: contain;
+}
+
+.mobileBottomLeft {
+  background-image: url("/mobile_bottom_left.png");
+  background-repeat: no-repeat;
+  background-position: left bottom;
+  background-size: contain;
+}
+
+.mobileBottomRight {
+  background-image: url("/mobile_bottom_right.png");
+  background-repeat: no-repeat;
+  background-position: right bottom;
+  background-size: contain;
+}

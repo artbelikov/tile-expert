@@ -1,0 +1,1 @@
+export { CompoundBackground } from './CompoundBackground';
