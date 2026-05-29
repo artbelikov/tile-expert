@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/app-layer/store';
 import { selectCartTotalQuantity } from '@/entities/cart';

@@ -3,6 +3,7 @@ import { CartCheckout } from './CartCheckout'
 import { useDispatch, useSelector } from 'react-redux'
 import { updateQuantity } from '@/entities/cart'
 import type { CartItem } from '@/entities/cart'
+import type { Tile } from '@/entities/tile'
 
 jest.mock('react-redux', () => ({
   useDispatch: jest.fn(),
@@ -10,7 +11,7 @@ jest.mock('react-redux', () => ({
 }))
 
 jest.mock('@/entities/tile', () => ({
-  TileGraphic: ({ tile }: { tile: { name: string } }) => <div data-testid="tile-graphic" data-name={tile.name} />,
+  TileGraphic: ({ tile }: { tile: Pick<Tile, 'name'> }) => <div data-testid="tile-graphic" data-name={tile.name} />,
 }))
 
 jest.mock('@/shared/lib/cn', () => ({
@@ -18,11 +19,16 @@ jest.mock('@/shared/lib/cn', () => ({
 }))
 
 const mockDispatch = jest.fn()
-const mockUseDispatch = useDispatch as jest.Mock
-const mockUseSelector = useSelector as jest.Mock
+const mockUseDispatch = useDispatch as jest.MockedFunction<typeof useDispatch>
+const mockUseSelector = useSelector as jest.MockedFunction<typeof useSelector>
 
-const createMockCartItem = (overrides: Partial<CartItem> = {}): CartItem => {
-  const { tile: tileOverrides, ...rest } = overrides
+interface MockCartItemOverrides {
+  tile?: Partial<Tile>
+  quantity?: number
+}
+
+const createMockCartItem = (overrides: MockCartItemOverrides = {}): CartItem => {
+  const { tile: tileOverrides, quantity } = overrides
   return {
     tile: {
       id: 'test-tile',
@@ -33,8 +39,7 @@ const createMockCartItem = (overrides: Partial<CartItem> = {}): CartItem => {
       image: '/test.png',
       ...tileOverrides,
     },
-    quantity: 50,
-    ...rest,
+    quantity: quantity ?? 50,
   }
 }
 
@@ -59,8 +64,8 @@ describe('CartCheckout', () => {
 
     it('renders cart items from Redux state', () => {
       const cartItems = [
-        createMockCartItem({ tile: { id: 'tile-1', name: 'Tile One' } as any }),
-        createMockCartItem({ tile: { id: 'tile-2', name: 'Tile Two' } as any }),
+        createMockCartItem({ tile: { id: 'tile-1', name: 'Tile One' } }),
+        createMockCartItem({ tile: { id: 'tile-2', name: 'Tile Two' } }),
       ]
       mockUseSelector.mockReturnValue(cartItems)
 
@@ -71,7 +76,7 @@ describe('CartCheckout', () => {
     })
 
     it('displays tile price formatted to 2 decimals', () => {
-      const cartItems = [createMockCartItem({ tile: { price: 25.5 } as any })]
+      const cartItems = [createMockCartItem({ tile: { price: 25.5 } })]
       mockUseSelector.mockReturnValue(cartItems)
 
       render(<CartCheckout />)
@@ -80,7 +85,7 @@ describe('CartCheckout', () => {
     })
 
     it('displays tile image when available', () => {
-      const cartItems = [createMockCartItem({ tile: { image: '/test-image.png' } as any })]
+      const cartItems = [createMockCartItem({ tile: { image: '/test-image.png' } })]
       mockUseSelector.mockReturnValue(cartItems)
 
       render(<CartCheckout />)
@@ -90,7 +95,7 @@ describe('CartCheckout', () => {
     })
 
     it('displays color gradient when no image', () => {
-      const cartItems = [createMockCartItem({ tile: { image: undefined, color: 'from-red-400 to-red-600' } as any })]
+      const cartItems = [createMockCartItem({ tile: { image: undefined, color: 'from-red-400 to-red-600' } })]
       mockUseSelector.mockReturnValue(cartItems)
 
       render(<CartCheckout />)
@@ -123,7 +128,7 @@ describe('CartCheckout', () => {
     })
 
     it('calculates shipping as FREE when subtotal > $500', () => {
-      const cartItems = [createMockCartItem({ tile: { price: 10 } as any, quantity: 100 })]
+      const cartItems = [createMockCartItem({ tile: { price: 10 }, quantity: 100 })]
       mockUseSelector.mockReturnValue(cartItems)
 
       render(<CartCheckout />)
@@ -132,7 +137,7 @@ describe('CartCheckout', () => {
     })
 
     it('calculates shipping as $25 when subtotal <= $500 and cart not empty', () => {
-      const cartItems = [createMockCartItem({ tile: { price: 5 } as any, quantity: 50 })]
+      const cartItems = [createMockCartItem({ tile: { price: 5 }, quantity: 50 })]
       mockUseSelector.mockReturnValue(cartItems)
 
       render(<CartCheckout />)
@@ -141,7 +146,7 @@ describe('CartCheckout', () => {
     })
 
     it('calculates grand total correctly', () => {
-      const cartItems = [createMockCartItem({ tile: { price: 10 } as any, quantity: 50 })]
+      const cartItems = [createMockCartItem({ tile: { price: 10 }, quantity: 50 })]
       mockUseSelector.mockReturnValue(cartItems)
 
       render(<CartCheckout />)
@@ -152,7 +157,7 @@ describe('CartCheckout', () => {
 
   describe('User Interactions', () => {
     it('dispatches updateQuantity when quantity input changes', () => {
-      const cartItems = [createMockCartItem({ tile: { id: 'test-id' } as any, quantity: 50 })]
+      const cartItems = [createMockCartItem({ tile: { id: 'test-id' }, quantity: 50 })]
       mockUseSelector.mockReturnValue(cartItems)
 
       render(<CartCheckout />)
@@ -164,7 +169,7 @@ describe('CartCheckout', () => {
     })
 
     it('dispatches updateQuantity with 0 when input value is negative', () => {
-      const cartItems = [createMockCartItem({ tile: { id: 'test-id' } as any, quantity: 50 })]
+      const cartItems = [createMockCartItem({ tile: { id: 'test-id' }, quantity: 50 })]
       mockUseSelector.mockReturnValue(cartItems)
 
       render(<CartCheckout />)
@@ -176,7 +181,7 @@ describe('CartCheckout', () => {
     })
 
     it('dispatches updateQuantity with quantity + 25 when ADD button clicked', () => {
-      const cartItems = [createMockCartItem({ tile: { id: 'test-id' } as any, quantity: 50 })]
+      const cartItems = [createMockCartItem({ tile: { id: 'test-id' }, quantity: 50 })]
       mockUseSelector.mockReturnValue(cartItems)
 
       render(<CartCheckout />)
@@ -188,7 +193,7 @@ describe('CartCheckout', () => {
     })
 
     it('dispatches updateQuantity with 0 when REMOVE button clicked', () => {
-      const cartItems = [createMockCartItem({ tile: { id: 'test-id' } as any, quantity: 50 })]
+      const cartItems = [createMockCartItem({ tile: { id: 'test-id' }, quantity: 50 })]
       mockUseSelector.mockReturnValue(cartItems)
 
       render(<CartCheckout />)

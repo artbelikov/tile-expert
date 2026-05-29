@@ -255,7 +255,8 @@ export function TileDesigner() {
               times: [0, 0.15, 0.45, 0.7, 1],
             }}
             onAnimationComplete={() => setShowHand(false)}
-            className="absolute bottom-4 right-4 w-24 h-24 object-contain pointer-events-none z-10"
+            className="absolute bottom-4 w-72 h-72 object-contain pointer-events-none z-10"
+            style={{ right: 220 }}
           />
         )}
       </div>
