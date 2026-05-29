@@ -1,4 +1,4 @@
-import type { Tile } from '@/entities/tile';
+import type { Tile } from '@/shared/types/tile';
 
 export interface CartItem {
   tile: Tile;

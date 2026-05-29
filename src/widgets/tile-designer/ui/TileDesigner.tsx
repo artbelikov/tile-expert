@@ -1,154 +1,30 @@
 'use client';
 
-import React, { memo, useCallback, useMemo, useState } from 'react';
+import { DndContext, type DragEndEvent, DragOverlay, type DragStartEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { motion } from 'framer-motion';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  DndContext,
-  DragOverlay,
-  useDraggable,
-  useDroppable,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragStartEvent,
-  DragEndEvent,
-} from '@dnd-kit/core';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { useAppDispatch, useAppSelector } from '@/app-layer/store/hooks';
+import { placeTileInGrid, selectPaletteTile } from '@/entities/tile';
 import { cn } from '@/shared/lib/cn';
-import { RootState } from '@/app-layer/store';
-import {
-  selectPaletteTile,
-  placeTileInGrid,
-  clearGrid,
-  Tile,
-} from '@/entities/tile';
+import type { Tile } from '@/shared/types/tile';
+import { DraggableTile } from './DraggableTile';
+import { DroppableGrid } from './DroppableGrid';
+import { TileGrid } from './TileGrid';
 
 const PANEL_BG = 'bg-surface-header';
 const CENTERED_FLEX = 'flex items-center justify-center';
-const FULL_IMAGE = 'w-full h-full object-cover pointer-events-none';
 const SECTION_HEADER = 'px-6 py-4 border-b-3 border-ink';
 const HEADER_TITLE = 'heading text-ink leading-tight text-center';
 const SCROLL_CONTAINER = 'max-h-palette custom-scrollbar';
 
-interface GridCellProps {
-  row: number;
-  col: number;
-  tile: Tile | null;
-  onClick: (row: number, col: number) => void;
-}
-
-const GridCell = memo(({ row, col, tile, onClick }: GridCellProps) => {
-  return (
-    <div
-      data-row={row}
-      data-col={col}
-      onClick={() => onClick(row, col)}
-      className={cn('w-14 h-14 border border-ink/20 flex-shrink-0', CENTERED_FLEX, 'cursor-pointer hover:bg-ink/5 transition-colors relative')}
-    >
-      {tile && <img src={tile.image} alt={tile.name} className={cn(FULL_IMAGE, 'absolute inset-0')} />}
-    </div>
-  );
-});
-
-GridCell.displayName = 'GridCell';
-
-interface TileGridProps {
-  grid: Record<string, string | null>;
-  paletteMap: Record<string, Tile>;
-  onCellClick: (row: number, col: number) => void;
-}
-
-const TileGrid = memo(({ grid, paletteMap, onCellClick }: TileGridProps) => {
-  const cells = useMemo(() => {
-    const result = [];
-    for (let r = 0; r < 70; r++) {
-      for (let c = 0; c < 70; c++) {
-        const key = `${r},${c}`;
-        const tileId = grid[key];
-        const tile = tileId ? paletteMap[tileId] || null : null;
-        result.push(<GridCell key={key} row={r} col={c} tile={tile} onClick={onCellClick} />);
-      }
-    }
-    return result;
-  }, [grid, paletteMap, onCellClick]);
-
-  return (
-    <div
-      id="tile-grid"
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(70, 56px)',
-        gridTemplateRows: 'repeat(70, 56px)',
-        width: 'max-content',
-      }}
-    >
-      {cells}
-    </div>
-  );
-});
-
-TileGrid.displayName = 'TileGrid';
-
-interface DraggableTileProps {
-  tile: Tile;
-  isDragging: boolean;
-  onClick: () => void;
-}
-
-function DraggableTile({ tile, isDragging, onClick }: DraggableTileProps) {
-  const { attributes, listeners, setNodeRef } = useDraggable({
-    id: tile.id,
-  });
-
-  return (
-    <div
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
-      onClick={onClick}
-      className={cn(
-        'relative w-20 h-20 rounded-md border-3',
-        CENTERED_FLEX,
-        'overflow-hidden cursor-pointer hover:scale-105 transition-all select-none outline-none border-ink',
-        isDragging && 'opacity-0 pointer-events-none',
-      )}
-    >
-      {tile.image ? (
-        <img src={tile.image} alt={tile.name} className={FULL_IMAGE} />
-      ) : (
-        <div className={`w-full h-full bg-gradient-to-br ${tile.color}`} />
-      )}
-    </div>
-  );
-}
-
-interface DroppableGridProps {
-  children: React.ReactNode;
-}
-
-function DroppableGrid({ children }: DroppableGridProps) {
-  const { setNodeRef } = useDroppable({
-    id: 'tile-grid',
-  });
-
-  return (
-    <div
-      ref={setNodeRef}
-      className={cn('flex-1 overflow-auto', SCROLL_CONTAINER, 'p-6 select-none bg-surface-table')}
-      id="tile-grid-container"
-    >
-      {children}
-    </div>
-  );
-}
-
 export function TileDesigner() {
-  const dispatch = useDispatch();
-  const palette = useSelector((state: RootState) => state.tile.palette);
-  const grid = useSelector((state: RootState) => state.tile.grid);
-  const selectedPaletteTileId = useSelector((state: RootState) => state.tile.selectedPaletteTileId);
+  const dispatch = useAppDispatch();
+  const palette = useAppSelector((state) => state.tile.palette);
+  const grid = useAppSelector((state) => state.tile.grid);
+  const selectedPaletteTileId = useAppSelector((state) => state.tile.selectedPaletteTileId);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [showHand, setShowHand] = useState(true);
+  const gridRef = useRef<HTMLDivElement>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -171,7 +47,7 @@ export function TileDesigner() {
     const clientX = mouseEvent.clientX + delta.x;
     const clientY = mouseEvent.clientY + delta.y;
 
-    const gridElement = document.getElementById('tile-grid');
+    const gridElement = gridRef.current?.querySelector('#tile-grid') as HTMLElement | null;
     if (!gridElement) return;
 
     const rect = gridElement.getBoundingClientRect();
@@ -264,7 +140,11 @@ export function TileDesigner() {
       <DragOverlay>
         {activeTile ? (
           <div
-            className={cn('w-14 h-14 rounded-md border-3 border-ink', CENTERED_FLEX, 'overflow-hidden opacity-90 shadow-xl pointer-events-none scale-105')}
+            className={cn(
+              'w-14 h-14 rounded-md border-3 border-ink',
+              CENTERED_FLEX,
+              'overflow-hidden opacity-90 shadow-xl pointer-events-none scale-105',
+            )}
           >
             {activeTile.image ? (
               <img src={activeTile.image} alt={activeTile.name} className="w-full h-full object-cover" />

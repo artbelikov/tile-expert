@@ -1,6 +1,4 @@
 .git
 .next
 node_modules
-bun.lock
-package-lock.json
 README.md

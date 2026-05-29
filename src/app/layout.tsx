@@ -34,10 +34,10 @@ export default function RootLayout({
           <Header />
           <main className="flex-1 max-w-container mx-auto w-full flex flex-col">
             <CompoundBackground>
-<div className="flex-1 flex flex-col justify-between">
-  <div className="flex-grow z-0">{children}</div>
-  <Footer />
-</div>
+              <div className="flex-1 flex flex-col justify-between">
+                <div className="flex-grow z-0">{children}</div>
+                <Footer />
+              </div>
             </CompoundBackground>
           </main>
         </Providers>

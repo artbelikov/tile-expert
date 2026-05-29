@@ -1,11 +1,10 @@
 'use client';
 
-import { useSelector } from 'react-redux';
-import type { RootState } from '@/app-layer/store';
+import { useAppSelector } from '@/app-layer/store/hooks';
 import { selectCartTotalQuantity } from '@/entities/cart';
 
 export function CartButton() {
-  const totalQuantity = useSelector((state: RootState) => selectCartTotalQuantity(state.cart));
+  const totalQuantity = useAppSelector((state) => selectCartTotalQuantity(state.cart));
 
   return (
     <button type="button" className="relative shrink-0 interactive">

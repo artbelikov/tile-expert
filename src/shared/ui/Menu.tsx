@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { cn } from '@/shared/lib/cn';
 
 export interface MenuItem {
@@ -8,7 +7,14 @@ export interface MenuItem {
   href: string;
 }
 
-export const menuItems: MenuItem[] = [
+interface MenuProps {
+  items?: MenuItem[];
+  className?: string;
+  itemClassName?: string;
+  onItemClick?: () => void;
+}
+
+const defaultMenuItems: MenuItem[] = [
   { name: 'Home', href: '/' },
   { name: 'Shop', href: '#shop' },
   { name: 'Collections', href: '#collection' },
@@ -18,20 +24,14 @@ export const menuItems: MenuItem[] = [
   { name: 'Blog', href: '#blog' },
 ];
 
-interface MenuProps {
-  className?: string;
-  itemClassName?: string;
-  onItemClick?: () => void;
-}
-
-export function Menu({ className, itemClassName, onItemClick }: MenuProps) {
+export function Menu({ items = defaultMenuItems, className, itemClassName, onItemClick }: MenuProps) {
   return (
     <nav
       className={cn('whitespace-nowrap min-w-0 overflow-x-auto no-scrollbar snap-x snap-mandatory shrink ml-auto mr-auto', className)}
       aria-label="Main Navigation"
     >
       <ul className="flex flex-nowrap items-center gap-10">
-        {menuItems.map((item) => (
+        {items.map((item) => (
           <li key={item.name} className="snap-start">
             <a
               href={item.href}

@@ -1,7 +1,9 @@
-import { CartButton } from '@/shared/ui/CartButton';
+'use client';
+
 import { Logo } from '@/shared/ui/Logo';
 import { Menu } from '@/shared/ui/Menu';
 import { ProfileButton } from '@/shared/ui/ProfileButton';
+import { CartButton } from './CartButton';
 
 export function Header() {
   return (
@@ -11,7 +13,7 @@ export function Header() {
       <Menu />
 
       <CartButton />
-      <ProfileButton />
+      <ProfileButton userName="A. Smith" />
     </header>
   );
 }

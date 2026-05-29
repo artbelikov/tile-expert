@@ -1,57 +1,16 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { Tile } from '@/entities/tile';
+import { SEED_CART_ITEMS, SEED_PALETTE } from '@/shared/lib/seed-data';
+import type { Tile } from '@/shared/types/tile';
 import type { CartItem } from './types';
 
 interface CartState {
   cart: CartItem[];
 }
 
-const initialCart: CartItem[] = [
-  {
-    tile: {
-      id: 'ocean-wave',
-      name: 'Ocean Wave',
-      price: 28.0,
-      color: 'from-blue-400 to-cyan-600',
-      pattern: 'wave',
-      image: '/tile_ocean_wave_pattern.png',
-    },
-    quantity: 150,
-  },
-  {
-    tile: {
-      id: 'forest-fern',
-      name: 'Forest Fern',
-      price: 30.0,
-      color: 'from-emerald-500 to-green-700',
-      pattern: 'fern',
-      image: '/tile_forest_fern_pattern.png',
-    },
-    quantity: 75,
-  },
-  {
-    tile: {
-      id: 'terracotta-dot',
-      name: 'Terracotta Dot',
-      price: 26.0,
-      color: 'from-orange-400 to-amber-700',
-      pattern: 'dot',
-      image: '/tile_terracotta_dot_pattern.png',
-    },
-    quantity: 200,
-  },
-  {
-    tile: {
-      id: 'yellow-star',
-      name: 'Yellow Star',
-      price: 29.0,
-      color: 'from-yellow-300 to-amber-500',
-      pattern: 'star',
-      image: '/tile_yellow_star_pattern.png',
-    },
-    quantity: 50,
-  },
-];
+const initialCart: CartItem[] = SEED_CART_ITEMS.map(({ tileId, quantity }) => {
+  const tile = SEED_PALETTE.find((t) => t.id === tileId)!;
+  return { tile, quantity };
+});
 
 const initialState: CartState = {
   cart: initialCart,
@@ -85,8 +44,6 @@ const cartSlice = createSlice({
     },
   },
 });
-
-export const selectCartTotalQuantity = (state: CartState) => state.cart.reduce((sum, item) => sum + item.quantity, 0);
 
 export const { addToCart, updateQuantity, removeFromCart, clearCart } = cartSlice.actions;
 export const cartReducer = cartSlice.reducer;

@@ -1,4 +1,3 @@
-import React, { memo } from 'react';
 import { cn } from '@/shared/lib/cn';
 import { CartCheckout } from '@/widgets/cart-checkout';
 import { CheckoutForm } from '@/widgets/checkout-form';

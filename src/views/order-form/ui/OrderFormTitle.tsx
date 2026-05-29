@@ -1,9 +1,7 @@
-import React from 'react';
 import { cn } from '@/shared/lib/cn';
 
 const decorImg = 'w-auto object-contain shrink-0 hover:scale-105 transition-transform duration-300 ease-out';
-const sideDecorImg =
-  'w-auto object-contain shrink-0 hover:scale-110 transition-transform duration-300 ease-out';
+const sideDecorImg = 'w-auto object-contain shrink-0 hover:scale-110 transition-transform duration-300 ease-out';
 
 export function OrderFormTitle() {
   return (

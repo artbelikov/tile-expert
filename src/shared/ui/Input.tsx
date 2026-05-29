@@ -11,22 +11,12 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   error?: string;
 }
 
-export function Input({
-  label,
-  variant = 'inline',
-  containerClassName,
-  labelClassName,
-  error,
-  className,
-  ...props
-}: InputProps) {
+export function Input({ label, variant = 'inline', containerClassName, labelClassName, error, className, ...props }: InputProps) {
   if (variant === 'stacked') {
     return (
       <div className={cn('flex flex-col w-full', containerClassName)}>
         {label && (
-          <label className={cn('font-bebas text-heading-sm tracking-wide text-ink select-none mb-1', labelClassName)}>
-            {label}
-          </label>
+          <label className={cn('font-bebas text-heading-sm tracking-wide text-ink select-none mb-1', labelClassName)}>{label}</label>
         )}
         <input
           className={cn(

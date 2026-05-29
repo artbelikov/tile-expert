@@ -1,11 +1,10 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { cn } from '@/shared/lib/cn';
-import type { RootState } from '@/app-layer/store';
-import { updateQuantity } from '@/entities/cart';
+import { useAppDispatch, useAppSelector } from '@/app-layer/store/hooks';
+import { selectGrandTotal, selectShipping, selectSubtotal, updateQuantity } from '@/entities/cart';
 import { TileGraphic } from '@/entities/tile';
+import { cn } from '@/shared/lib/cn';
 
 const thCell = 'py-3 px-2 text-center text-body-lg heading font-normal tracking-wider text-ink-soft w-[20%]';
 const tdCell = 'p-2 text-center bordered-r';
@@ -52,12 +51,11 @@ function TotalRow({
 }
 
 export function CartCheckout() {
-  const dispatch = useDispatch();
-  const cartItems = useSelector((state: RootState) => state.cart.cart);
-
-  const subtotal = cartItems.reduce((sum, item) => sum + item.quantity * item.tile.price, 0);
-  const shipping = subtotal === 0 ? 0 : subtotal > 500 ? 0 : 25;
-  const grandTotal = subtotal + shipping;
+  const dispatch = useAppDispatch();
+  const cartItems = useAppSelector((state) => state.cart.cart);
+  const subtotal = useAppSelector((state) => selectSubtotal(state.cart));
+  const shipping = useAppSelector((state) => selectShipping(state.cart));
+  const grandTotal = useAppSelector((state) => selectGrandTotal(state.cart));
 
   return (
     <div className="w-full">

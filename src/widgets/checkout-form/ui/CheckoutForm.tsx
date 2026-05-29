@@ -1,10 +1,9 @@
 'use client';
 
 import { useForm } from '@tanstack/react-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '@/app-layer/store/hooks';
+import { clearCart, selectGrandTotal, selectShipping, selectSubtotal } from '@/entities/cart';
 import { cn } from '@/shared/lib/cn';
-import type { RootState } from '@/app-layer/store';
-import { clearCart } from '@/entities/cart';
 import { Button } from '@/shared/ui/Button';
 import { Input } from '@/shared/ui/Input';
 
@@ -19,11 +18,10 @@ const getFieldError = (meta: { isTouched: boolean; errors: (string | undefined)[
   meta.isTouched && meta.errors.length ? meta.errors.filter(Boolean).join(', ') : undefined;
 
 export function CheckoutForm() {
-  const dispatch = useDispatch();
-  const cartItems = useSelector((state: RootState) => state.cart.cart);
-  const subtotal = cartItems.reduce((sum, item) => sum + item.quantity * item.tile.price, 0);
-  const shipping = subtotal === 0 ? 0 : subtotal > 500 ? 0 : 25;
-  const grandTotal = subtotal + shipping;
+  const dispatch = useAppDispatch();
+  const subtotal = useAppSelector((state) => selectSubtotal(state.cart));
+  const shipping = useAppSelector((state) => selectShipping(state.cart));
+  const grandTotal = useAppSelector((state) => selectGrandTotal(state.cart));
 
   const form = useForm({
     defaultValues: {
@@ -38,7 +36,7 @@ export function CheckoutForm() {
       cardCvv: '',
     },
     onSubmit: async ({ value }) => {
-      alert(JSON.stringify({ ...value, subtotal, shipping, grandTotal }, null, 2));
+      console.info('Order submitted:', { ...value, subtotal, shipping, grandTotal });
       dispatch(clearCart());
       form.reset();
     },
@@ -73,47 +71,47 @@ export function CheckoutForm() {
           )}
         </form.Field>
 
-          <form.Field
-            name="phone"
-            validators={{
-              onChange: ({ value }) => (!value ? 'Phone is required' : undefined),
-            }}
-          >
-            {(field) => (
-              <Input
-                label="PHONE:"
-                id={field.name}
-                name={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                error={getFieldError(field.state.meta)}
-              />
-            )}
-          </form.Field>
+        <form.Field
+          name="phone"
+          validators={{
+            onChange: ({ value }) => (!value ? 'Phone is required' : undefined),
+          }}
+        >
+          {(field) => (
+            <Input
+              label="PHONE:"
+              id={field.name}
+              name={field.name}
+              value={field.state.value}
+              onBlur={field.handleBlur}
+              onChange={(e) => field.handleChange(e.target.value)}
+              error={getFieldError(field.state.meta)}
+            />
+          )}
+        </form.Field>
 
-          <form.Field
-            name="email"
-            validators={{
-              onChange: ({ value }) => {
-                if (!value) return 'Email is required';
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Invalid email address';
-                return undefined;
-              },
-            }}
-          >
-            {(field) => (
-              <Input
-                label="EMAIL:"
-                id={field.name}
-                name={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                error={getFieldError(field.state.meta)}
-              />
-            )}
-          </form.Field>
+        <form.Field
+          name="email"
+          validators={{
+            onChange: ({ value }) => {
+              if (!value) return 'Email is required';
+              if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Invalid email address';
+              return undefined;
+            },
+          }}
+        >
+          {(field) => (
+            <Input
+              label="EMAIL:"
+              id={field.name}
+              name={field.name}
+              value={field.state.value}
+              onBlur={field.handleBlur}
+              onChange={(e) => field.handleChange(e.target.value)}
+              error={getFieldError(field.state.meta)}
+            />
+          )}
+        </form.Field>
 
         <form.Field
           name="shippingAddress"
